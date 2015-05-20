@@ -17,11 +17,11 @@ bin/cade: bin obj/agent.o obj/group.o obj/main.o
 obj:
 	mkdir -p obj
 
-obj/agent.o: obj agent.c agent.h
-	$(CC) -g $(CFLAGS) -c agent.c -o obj/agent.o
+obj/agent.o: obj
+	$(CC) -g $(CFLAGS) -c $(DIR)/agent.c -o obj/agent.o
 
-obj/main.o: obj main.c
-	$(CC) -g $(CFLAGS) -c main.c -o obj/main.o
+obj/main.o: obj
+	$(CC) -g $(CFLAGS) -c $(DIR)/main.c -o obj/main.o
 
-obj/group.o: obj wrap.cc wrap.hh qosfs.hh
-	$(CC) -g $(CFLAGS) -c group.c -o obj/group.o
+obj/group.o: obj
+	$(CC) -g $(CFLAGS) -c $(DIR)/group.c -o obj/group.o

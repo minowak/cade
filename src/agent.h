@@ -39,7 +39,7 @@ struct agent_desc {
 /* Node for agent description list. */
 struct agent_desc_node {
 	struct agent_desc_node * next;
-	struct * agent_desc;
+	struct agent_desc * desc;
 };
 
 /* Manager agent. */
