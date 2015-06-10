@@ -14,7 +14,7 @@ agent_t agent;  /* This agent. */
 
 void handle_message(char * sender, char * message, char * reply)
 {
-  sprintf(reply, "%s;%s;error", agent.id, sender);
+  memset(reply, 0, strlen(reply));
   if(agent.state == INITIALIZING && strcmp(message, "register-ok") == 0)
   {
     printf("Registered successfully in group %s\n", sender);

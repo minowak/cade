@@ -104,14 +104,18 @@ void * listen_loop(void * unused)
     char receiver[50];
     char message[50];
 
-    sscanf(msgbuf, "%s;%s;%s", sender, receiver, message);
+    sscanf(msgbuf, "%[^;];%[^;];%[^;]", sender, receiver, message);
     printf("Received multicast message for %s [%s]\n", receiver, msgbuf);
     if(strcmp(receiver, name) == 0)
     {
       printf("Received message '%s' from agent %s\n", message, sender);
       char reply[150];
       handle_message(sender, message, reply);
-      send_multicast_message(reply);
+      if(strlen(reply) > 0)
+      {
+        send_multicast_message(reply);
+        memset(reply, 0, strlen(reply));
+      }
     }
   }
 }

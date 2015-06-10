@@ -20,7 +20,7 @@ int has_agent(char * a_name)
   int i;
   for(i = 0 ; i < MAXAGENTS ; i = i + 1)
   {
-    if(strcmp(agents[i], a_name) == 0)
+    if(agents[i] != NULL && strcmp(agents[i], a_name) == 0)
     {
       return 1;
     }
@@ -31,13 +31,13 @@ int has_agent(char * a_name)
 /* Creates response for message. */
 void handle_message(char * sender, char * message, char * reply)
 {
-  sprintf(reply, "%s;%s;error", g_name, sender);
+  memset(reply, 0, strlen(reply));
   if(strcmp(message, "register") == 0 && !has_agent(sender))
   {
     agents[agents_number] = (char *) malloc(sizeof(sender));
     strcpy(agents[agents_number], sender);
     agents_number = agents_number + 1;
-    printf("Registered new agent: %s", sender);
+    printf("Registered new agent: %s\n", sender);
     sprintf(reply, "%s;%s;register-ok", g_name, sender);
   } else
   if(starts_with(message, "status"))
@@ -81,7 +81,7 @@ int main(int argc, char ** argv)
       if(strcmp(buff, "s") == 0)
       {
         int i;
-        printf("Asking for agents status...\n");
+        printf("Asking for agents status[%d]...\n", agents_number);
         for(i = 0 ; i < agents_number ; i++)
         {
           char msg[150];
