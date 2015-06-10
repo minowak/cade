@@ -31,8 +31,42 @@ void handle_message(char * sender, char * message, char * reply)
     if(strcmp(message, "status") == 0)
     {
       send_status(agent, sender, reply);
+    } else
+    if(starts_with("start", message))
+    {
+      char args[50];
+      sscanf(message, "start-%s", args);
+      char msg[256];
+      void * result = malloc(256);
+      if(do_task(args, result))
+      {
+        sprintf(msg, "%s;%s;result-%s", agent.id, sender, (char *)result);
+      } else
+      {
+        sprintf(msg, "%s;%s;failed", agent.id, sender);
+      }
+      send_multicast_message(msg);
     }
   }
+}
+
+/* TASK */
+
+int task(void * args, void * result)
+{
+  char * ping = (char *)args;
+  strcpy(result, "pong");
+  return 1;
+}
+
+int do_task(void * args, void * result)
+{
+  if(strcmp(agent.service.type, "once") == 0)
+  {
+    return task(args, result);
+  }
+  return 0;
+  // TODO rest
 }
 
 /* Main. */

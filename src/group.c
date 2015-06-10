@@ -33,6 +33,8 @@ int has_agent(char * a_name)
 /* Creates response for message. */
 void handle_message(char * sender, char * message, char * reply)
 {
+  // TODO handle result from agents
+  // and add callback after to modify them, select max/min, best etc
   memset(reply, 0, strlen(reply));
   if(strcmp(message, "register") == 0 && !has_agent(sender))
   {
@@ -55,6 +57,12 @@ void handle_message(char * sender, char * message, char * reply)
     services[services_number].name = name;
     services_number++;
   }
+}
+
+char * search_free_agent(agent_service_t service)
+{
+  // TODO ask for status, and return agent name if LISTENING
+  return NULL;
 }
 
 /* Main. */
@@ -105,6 +113,23 @@ int main(int argc, char ** argv)
         for(i = 0 ; i < agents_number ; i++)
         {
           printf("%d) %s\n", i+1, agents[i]);
+        }
+      } else
+      if(strcmp(buff, "sv") == 0)
+      {
+        int i;
+        printf("Select service to start:\n");
+        for(i = 0 ; i < services_number ; i++)
+        {
+          printf("%d) %s - %s\n", i+1, services[i].name, services[i].type);
+        }
+        if(get_line(PROMPT, buff, sizeof(buff)) == OK)
+        {
+          int nr = atoi(buff);
+          char msg[150];
+          search_free_agent(services[nr]); // TODO
+          sprintf(msg, "%s;%s;start-%s", g_name, services[nr].agent_id, services[nr].name);
+          send_multicast_message(msg);
         }
       }
     }
