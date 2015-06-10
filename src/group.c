@@ -13,6 +13,8 @@
 char ** agents; /* Agents holder. */
 int agents_number = 0; /* Number of agents. */
 char * g_name; /* Group name. */
+agent_service_t services[MAXAGENTS];
+int services_number = 0;
 
 /* Checks if agent is already registered. */
 int has_agent(char * a_name)
@@ -40,12 +42,18 @@ void handle_message(char * sender, char * message, char * reply)
     printf("Registered new agent: %s\n", sender);
     sprintf(reply, "%s;%s;register-ok", g_name, sender);
   } else
-  if(starts_with(message, "status"))
+  if(starts_with("service", message))
   {
+    printf("Registering service %s for agent %s\n", message, sender);
+
     char type[50];
-    char status[50];
-    sscanf(message, "%s-%s", type, status);
-    printf("Status of agent %s is %s\n", sender, status);
+    char name[50];
+
+    sscanf(message, "service-%[^-]-%[^-]", type, name);
+    services[services_number].agent_id = sender;
+    services[services_number].type = type;
+    services[services_number].name = name;
+    services_number++;
   }
 }
 
@@ -88,6 +96,15 @@ int main(int argc, char ** argv)
           sprintf(msg, "%s;%s;status", g_name, agents[i]);
           printf("Sending status request to %s\n", agents[i]);
           send_multicast_message(msg);
+        }
+      } else
+      if(strcmp(buff, "a") == 0)
+      {
+        printf("Agent list:\n");
+        int i;
+        for(i = 0 ; i < agents_number ; i++)
+        {
+          printf("%d) %s\n", i+1, agents[i]);
         }
       }
     }

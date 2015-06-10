@@ -18,6 +18,12 @@ void handle_message(char * sender, char * message, char * reply)
   if(agent.state == INITIALIZING && strcmp(message, "register-ok") == 0)
   {
     printf("Registered successfully in group %s\n", sender);
+    printf("Registering service\n");
+
+    char msg[256];
+    sprintf(msg, "%s;%s;service-%s-%s", agent.id, sender, agent.service.type, agent.service.name);
+    send_multicast_message(msg);
+
     agent.state = LISTENING;
   } else
   if(agent.state == LISTENING)
@@ -41,6 +47,12 @@ int main(int argc, char ** argv)
   agent.id = argv[1];
   agent.gid = argv[2];
   agent.state = INITIALIZING;
+
+  /* SERVICE BEGIN */
+  agent.service.agent_id = agent.id;
+  agent.service.type = "once";
+  agent.service.name = "s1";
+  /* SERVICE END */
 
   printf("Creating listening thread\n");
 
@@ -67,7 +79,6 @@ int main(int argc, char ** argv)
         printf("Exitting...\n");
         return 0;
       }
-      // TODO
     }
   }
 }
