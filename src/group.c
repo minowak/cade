@@ -38,8 +38,15 @@ void handle_message(char * sender, char * message, char * reply)
     strcpy(agents[agents_number], sender);
     agents_number = agents_number + 1;
     printf("Registered new agent: %s", sender);
+    sprintf(reply, "%s;%s;register-ok", g_name, sender);
+  } else
+  if(starts_with(message, "status"))
+  {
+    char type[50];
+    char status[50];
+    sscanf(message, "%s-%s", type, status);
+    printf("Status of agent %s is %s\n", sender, status);
   }
-  sprintf(reply, "%s;%s;ok", g_name, sender);
 }
 
 /* Main. */
@@ -70,8 +77,19 @@ int main(int argc, char ** argv)
       {
         printf("Exitting...\n");
         return 0;
+      } else
+      if(strcmp(buff, "s") == 0)
+      {
+        int i;
+        printf("Asking for agents status...\n");
+        for(i = 0 ; i < agents_number ; i++)
+        {
+          char msg[150];
+          sprintf(msg, "%s;%s;status", g_name, agents[i]);
+          printf("Sending status request to %s\n", agents[i]);
+          send_multicast_message(msg);
+        }
       }
-        // TODO
     }
   }
 }

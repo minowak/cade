@@ -11,6 +11,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #define OK       0
 #define NO_INPUT 1
@@ -27,7 +28,7 @@
 static int send_multicast_message(char * msg)
 {
   struct sockaddr_in g_addr;
-  int fd, cnt;
+  int fd;
 
   if((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
   {
@@ -39,7 +40,7 @@ static int send_multicast_message(char * msg)
   g_addr.sin_addr.s_addr = inet_addr(HOST);
   g_addr.sin_port = htons(PORT);
 
-  if(sendto(fd, msg, sizeof(msg), 0, (struct sockaddr *) &g_addr, sizeof(g_addr)) < 0)
+  if(sendto(fd, msg, strlen(msg), 0, (struct sockaddr *) &g_addr, sizeof(g_addr)) < 0)
   {
     printf("ERROR sending message\n");
     return 0;
@@ -104,7 +105,7 @@ void * listen_loop(void * unused)
     char message[50];
 
     sscanf(msgbuf, "%s;%s;%s", sender, receiver, message);
-    printf("Received multicast message for %s - %s\n", receiver, msgbuf);
+    printf("Received multicast message for %s [%s]\n", receiver, msgbuf);
     if(strcmp(receiver, name) == 0)
     {
       printf("Received message '%s' from agent %s\n", message, sender);
@@ -142,6 +143,14 @@ static int get_line (char * prmpt, char * buff, size_t sz)
 
   buff[strlen(buff)-1] = '\0';
   return OK;
+}
+
+int starts_with(const char *pre, const char *str)
+{
+  size_t lenpre = strlen(pre),
+  lenstr = strlen(str);
+  if(lenstr < lenpre) return 0;
+  return !strncmp(pre, str, lenpre);
 }
 
 #endif

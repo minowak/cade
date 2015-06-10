@@ -1,9 +1,9 @@
 CC=gcc
-CFLAGS=-Wall
-LINKFLAGS=-Wall
+CFLAGS=
+LINKFLAGS=-lpthread
 DIR=src
 
-all: bin/cade
+all: bin/agent bin/group
 
 clean:
 	rm -rf bin obj
@@ -11,17 +11,17 @@ clean:
 bin:
 	mkdir -p bin
 
-bin/cade: bin obj/agent.o obj/group.o obj/main.o
-	$(CC) -g -o bin/cade obj/* $(LINKFLAGS)
+bin/agent: bin obj/agent.o
+	$(CC) -g -o bin/agent obj/agent.o $(LINKFLAGS)
+
+bin/group: bin obj/group.o
+	$(CC) -g -o bin/group obj/group.o $(LINKFLAGS)
 
 obj:
 	mkdir -p obj
 
 obj/agent.o: obj
 	$(CC) -g $(CFLAGS) -c $(DIR)/agent.c -o obj/agent.o
-
-obj/main.o: obj
-	$(CC) -g $(CFLAGS) -c $(DIR)/main.c -o obj/main.o
 
 obj/group.o: obj
 	$(CC) -g $(CFLAGS) -c $(DIR)/group.c -o obj/group.o

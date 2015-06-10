@@ -10,9 +10,23 @@
 #include <arpa/inet.h>
 #include <time.h>
 
+agent_t agent;  /* This agent. */
+
 void handle_message(char * sender, char * message, char * reply)
 {
-  // TODO
+  sprintf(reply, "%s;%s;error", agent.id, sender);
+  if(agent.state == INITIALIZING && strcmp(message, "register-ok") == 0)
+  {
+    printf("Registered successfully in group %s\n", sender);
+    agent.state = LISTENING;
+  } else
+  if(agent.state == LISTENING)
+  {
+    if(strcmp(message, "status") == 0)
+    {
+      send_status(agent, sender, reply);
+    }
+  }
 }
 
 /* Main. */
@@ -24,19 +38,20 @@ int main(int argc, char ** argv)
     return 0;
   }
 
-  char * a_name = argv[1];
-  char * g_name = argv[2];
+  agent.id = argv[1];
+  agent.gid = argv[2];
+  agent.state = INITIALIZING;
 
   printf("Creating listening thread\n");
 
   pthread_t listen_t;
-  pthread_create(&listen_t, NULL, &listen_loop, (void *) a_name);
+  pthread_create(&listen_t, NULL, &listen_loop, (void *) agent.id);
 
-  printf("Agent '%s' started\n", a_name);
-  printf("Connecting to group '%s'\n", g_name);
+  printf("Agent '%s' started\n", agent.id);
+  printf("Connecting to group '%s'\n", agent.gid);
 
-  char msg[150];
-  sprintf(msg, "%s;%s;register", a_name, g_name);
+  char msg[256];
+  sprintf(msg, "%s;%s;register", agent.id, agent.gid);
 
   printf("Registering agent [%s]...\n", msg);
   send_multicast_message(msg);
