@@ -40,6 +40,7 @@ static int send_multicast_message(char * msg)
   g_addr.sin_addr.s_addr = inet_addr(HOST);
   g_addr.sin_port = htons(PORT);
 
+  printf("Sending multicast message [%s]\n", msg);
   if(sendto(fd, msg, strlen(msg), 0, (struct sockaddr *) &g_addr, sizeof(g_addr)) < 0)
   {
     printf("ERROR sending message\n");
@@ -94,7 +95,7 @@ void * listen_loop(void * unused)
   while(1)
   {
     addrlen = sizeof(addr);
-
+    memset(msgbuf, 0, MSGBUFSIZE - 1);
     if((n_bytes = recvfrom(fd, msgbuf, MSGBUFSIZE, 0, (struct sockaddr *) &addr, &addrlen)) < 0)
     {
       printf("ERROR while receiving message\n");
@@ -105,7 +106,6 @@ void * listen_loop(void * unused)
     char message[50];
 
     sscanf(msgbuf, "%[^;];%[^;];%[^;]", sender, receiver, message);
-    printf("Received multicast message for %s [%s]\n", receiver, msgbuf);
     if(strcmp(receiver, name) == 0)
     {
       printf("Received message '%s' from agent %s\n", message, sender);
