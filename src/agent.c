@@ -11,7 +11,6 @@
 #include <time.h>
 
 agent_t agent;  /* This agent. */
-char ** agent_args; /* Arguments passed to agent on startup. May be used to configure execution of a task. */
 
 void handle_message(char * sender, char * message, char * reply)
 {
@@ -53,13 +52,19 @@ void handle_message(char * sender, char * message, char * reply)
 
 /* TASK BEGIN */
 
+char * left;
+char * right;
+
 int task(void * args, void * result)
 {
   FILE *fp;
   int status;
   char path[1024];
 
-  fp = popen("python gen.py", "r");
+  char cmd[256];
+  sprintf(cmd, "python gen.py %s %s", left, right);
+
+  fp = popen(cmd, "r");
   if(fp == NULL)
   {
     return -1;
@@ -88,13 +93,14 @@ int do_task(void * args, void * result)
 /* Main. */
 int main(int argc, char ** argv)
 {
-  if(argc < 3)
+  if(argc < 5)
   {
-    printf("Usage: %s <agent_name> <group_name>\n", argv[0]);
+    printf("Usage: %s <agent_name> <group_name> <left> <right>\n", argv[0]);
     return 0;
   }
 
-  agent_args = argv;
+  left = argv[3];
+  right = argv[4];
 
   agent.id = argv[1];
   agent.gid = argv[2];

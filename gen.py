@@ -4,8 +4,9 @@ from random import uniform
 from math import cos
 from math import pi
 from copy import deepcopy
+import sys
 
-initial_range = (-10, 10)
+initial_range = (int(sys.argv[1]), int(sys.argv[2]))
 population_size = 5
 selected_size = 3
 mutate_chance = 10
@@ -33,11 +34,11 @@ def draw_index(fitness):
 	return fitness.index(max(fitness))
 
 def crossover(c1, c2):
-	return (c1 - random() + c2 - random())/2
+	return (c1 + c2)/2
 
 def mutate(c):
 	if randint(0, 100) < mutate_chance:
-		return -c * random()
+		return c + random()
 	return c
 
 pop = initial_pop()
