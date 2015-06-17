@@ -11,6 +11,7 @@
 #include <time.h>
 
 agent_t agent;  /* This agent. */
+char ** agent_args; /* Arguments passed to agent on startup. May be used to configure execution of a task. */
 
 void handle_message(char * sender, char * message, char * reply)
 {
@@ -40,7 +41,7 @@ void handle_message(char * sender, char * message, char * reply)
       void * result = malloc(256);
       if(do_task(args, result))
       {
-        sprintf(msg, "%s;%s;result-%s", agent.id, sender, (char *)result);
+        sprintf(msg, "%s;%s;result(%s)", agent.id, sender, (char *)result);
       } else
       {
         sprintf(msg, "%s;%s;failed", agent.id, sender);
@@ -50,14 +51,29 @@ void handle_message(char * sender, char * message, char * reply)
   }
 }
 
-/* TASK */
+/* TASK BEGIN */
 
 int task(void * args, void * result)
 {
-  char * ping = (char *)args;
-  strcpy(result, "pong");
+  FILE *fp;
+  int status;
+  char path[1024];
+
+  fp = popen("python gen.py", "r");
+  if(fp == NULL)
+  {
+    return -1;
+  }
+  while(fgets(path, 1024, fp) != NULL)
+  {
+    sprintf(result, "%s", path);
+  }
+  pclose(fp);
+
   return 1;
 }
+
+/* TASK END */
 
 int do_task(void * args, void * result)
 {
@@ -77,6 +93,8 @@ int main(int argc, char ** argv)
     printf("Usage: %s <agent_name> <group_name>\n", argv[0]);
     return 0;
   }
+
+  agent_args = argv;
 
   agent.id = argv[1];
   agent.gid = argv[2];

@@ -131,6 +131,17 @@ int main(int argc, char ** argv)
           sprintf(msg, "%s;%s;start-%s", g_name, services[nr].agent_id, services[nr].name);
           send_multicast_message(msg);
         }
+        if(strcmp(buff, "all"))
+        {
+          int i;
+          for(i = 0 ; i < services_number ; i++)
+          {
+            char msg[150];
+            search_free_agent(services[i]); // TODO
+            sprintf(msg, "%s;%s;start-%s", g_name, services[i].agent_id, services[i].name);
+            send_multicast_message(msg);
+          }
+        }
       }
     }
   }
