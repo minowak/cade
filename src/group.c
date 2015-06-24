@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <time.h>
@@ -32,15 +33,18 @@ int has_agent(char * a_name)
 
 /* RESULT HANDLER BEGIN */
 
-float max_val = -32000; /* Holding maximum found value. */
+float max_val = 32000; /* Holding maximum found value. */
+struct timeval before, after, tval_result;
 
 void handle_result(char * result)
 {
   float val = atof(result);
-  if (val > max_val)
+  timersub(&after, &before, &tval_result);
+  printf("Time: %ld.%06ld\n", (long int) tval_result.tv_sec, (long int) tval_result.tv_usec);
+  if (val < max_val)
   {
     max_val = val;
-    printf("==> Result updated. New maximum is: %f\n", max_val);
+    printf("==> Result updated. New minimum is: %f\n", max_val);
   }
 }
 
@@ -78,6 +82,7 @@ void handle_message(char * sender, char * message, char * reply)
   } else
   if(starts_with("result", message))
   {
+    gettimeofday(&after, NULL);
     char res[255];
     sscanf(message, "result(%[^)])", res);
     printf("==> Got result: %s\n", res);
@@ -155,6 +160,7 @@ int main(int argc, char ** argv)
           char msg[150];
           search_free_agent(services[nr]); // TODO
           sprintf(msg, "%s;%s;start-%s", g_name, services[nr].agent_id, services[nr].name);
+	  gettimeofday(&before, NULL);
           send_multicast_message(msg);
         }
       } else

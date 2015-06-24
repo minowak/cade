@@ -9,8 +9,8 @@ import sys
 initial_range = (int(sys.argv[1]), int(sys.argv[2]))
 population_size = 5
 selected_size = 3
-mutate_chance = 10
-iterations = 10000
+mutate_chance = 5
+iterations = 5000
 
 def initial_pop():
 	return [randint(initial_range[0], initial_range[1]) for i in range(population_size)]
@@ -18,7 +18,7 @@ def initial_pop():
 def fitness(candidates):
 	f = []
 	for c in candidates:
-		fit = 10 + ((c - 1)**2 -10 * cos(2 * pi * (c - 1)))
+		fit = -(10 + ((c - 1)**2 -10 * cos(2 * pi * (c - 1))))
 		f.append(fit)
 	return f
 
